@@ -1,6 +1,7 @@
 import { ActionPanel, List, Action, Icon, Color } from "@raycast/api";
 import { useSQL } from "@raycast/utils";
-import { AddEntry } from "./components/AddEntry";
+import { AddEntryForm } from "./components/AddEntryForm";
+import { DayList } from "./components/DayList";
 import { GODZINY_DB } from "./const";
 import { DAY_SUMMARY } from "./lib/queries";
 import { DayEntry } from "./types";
@@ -12,8 +13,6 @@ export default function Command() {
     return permissionView;
   }
 
-  console.log(data);
-
   return (
     <List isLoading={isLoading}>
       <List.Item
@@ -21,7 +20,7 @@ export default function Command() {
         title="Dodaj nowy wpis"
         actions={
           <ActionPanel>
-            <Action.Push title="Przejdź dodowania nowego wpisu" target={<AddEntry />} />
+            <Action.Push title="Przejdź dodowania nowego wpisu" target={<AddEntryForm />} />
           </ActionPanel>
         }
       />
@@ -38,6 +37,11 @@ export default function Command() {
               },
             },
           ]}
+          actions={
+            <ActionPanel>
+              <Action.Push title="Przejdź do podsumowania dnia" target={<DayList day={entry.day} />} />
+            </ActionPanel>
+          }
         />
       ))}
     </List>
