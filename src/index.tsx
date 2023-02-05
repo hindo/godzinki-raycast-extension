@@ -1,49 +1,33 @@
-import { ActionPanel, List, Action, Icon, Color } from "@raycast/api";
-import { useSQL } from "@raycast/utils";
-import { AddEntryForm } from "./components/AddEntryForm";
-import { DayList } from "./components/DayList";
-import { GODZINY_DB } from "./const";
-import { DAY_SUMMARY } from "./lib/queries";
-import { DayEntry } from "./types";
+import { ActionPanel, List, Action, Icon, LocalStorage } from "@raycast/api"
+import { AddEntryForm } from "./components/AddEntryForm"
+import { DayListItem } from "./components/DayListItem"
+import { dataToFile } from "./lib/backup"
+import { dayItemSelector, useStore } from "./lib/store"
 
 export default function Command() {
-  const { isLoading, data, permissionView } = useSQL<DayEntry>(GODZINY_DB, DAY_SUMMARY);
+  const days = useStore(dayItemSelector)
 
-  if (permissionView) {
-    return permissionView;
+  const handleDataBackup = async () => {
+    const data = await LocalStorage.getItem("godziny")
+    await dataToFile(data)
   }
 
   return (
-    <List isLoading={isLoading}>
+    <List>
       <List.Item
         icon={Icon.Calendar}
         title="Dodaj nowy wpis"
         actions={
           <ActionPanel>
             <Action.Push title="Przejdź dodowania nowego wpisu" target={<AddEntryForm />} />
+            <Action title="Zrób backup" onAction={handleDataBackup} />
+            <Action title="Wyczyść magazyn" onAction={async () => await LocalStorage.removeItem("godziny")} />
           </ActionPanel>
         }
       />
-      {(data || []).map((entry) => (
-        <List.Item
-          key={entry.id}
-          icon={Icon.ChevronRight}
-          title={entry.day}
-          accessories={[
-            {
-              text: {
-                value: `Czas: ${entry.timeSummary.toString()}h`,
-                color: entry.timeSummary >= 8 ? Color.Green : Color.Red,
-              },
-            },
-          ]}
-          actions={
-            <ActionPanel>
-              <Action.Push title="Przejdź do podsumowania dnia" target={<DayList day={entry.day} />} />
-            </ActionPanel>
-          }
-        />
+      {days.map((entry) => (
+        <DayListItem key={entry.id} entry={entry} />
       ))}
     </List>
-  );
+  )
 }
