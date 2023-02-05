@@ -1,4 +1,5 @@
 import { Color, Icon, List } from "@raycast/api"
+import { Fragment } from "react"
 import { DayEntry, Task, useStore } from "../lib/store"
 
 export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry; showAccessories: boolean }) => {
@@ -26,8 +27,8 @@ export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry
         <List.Item.Detail
           metadata={
             <List.Item.Detail.Metadata>
-              {dayTasks.map((task) => (
-                <>
+              {dayTasks.map((task, idx) => (
+                <Fragment key={`${task.id}-${idx}`}>
                   <List.Item.Detail.Metadata.Label
                     title="Zadanie"
                     icon={Icon.Hashtag}
@@ -36,7 +37,7 @@ export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry
                   <List.Item.Detail.Metadata.Label title="Ilość godzin" icon={Icon.Clock} text={`${task.timeEntry}h`} />
                   {task.description ? <List.Item.Detail.Metadata.Label title="Opis" text={task.description} /> : null}
                   <List.Item.Detail.Metadata.Separator />
-                </>
+                </Fragment>
               ))}
             </List.Item.Detail.Metadata>
           }

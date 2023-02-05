@@ -41,16 +41,7 @@ export default function Command() {
   }
 
   return (
-    <List
-      isShowingDetail={showDetails}
-      onSelectionChange={handleOnSelectionChange}
-      actions={
-        <ActionPanel>
-          <Action title="Zrób backup" onAction={handleDataBackup} />
-          <Action title="Wyczyść magazyn" onAction={handleStoreClear} />
-        </ActionPanel>
-      }
-    >
+    <List isShowingDetail={showDetails} onSelectionChange={handleOnSelectionChange}>
       <List.Item
         id="add-new-entry"
         icon={Icon.Plus}
@@ -58,6 +49,8 @@ export default function Command() {
         actions={
           <ActionPanel>
             <Action.Push title="Przejdź dodowania nowego wpisu" target={<AddEntryForm />} />
+            <Action title="Zrób backup" onAction={handleDataBackup} />
+            <Action title="Wyczyść magazyn" onAction={handleStoreClear} />
           </ActionPanel>
         }
       />
