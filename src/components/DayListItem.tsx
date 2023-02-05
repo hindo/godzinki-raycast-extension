@@ -1,24 +1,46 @@
-import { Action, ActionPanel, Color, Icon, List } from "@raycast/api"
-import { DayList } from "./DayList"
+import { Color, Icon, List } from "@raycast/api"
+import { DayEntry, Task, useStore } from "../lib/store"
 
-export const DayListItem = ({ entry }) => {
+export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry; showAccessories: boolean }) => {
+  const tasks = useStore((state) => state.tasks)
+
+  const dayTasks = tasks.filter((task) => task.createdAt === entry.day)
+
   return (
     <List.Item
+      id={entry.id}
       key={entry.id}
-      icon={Icon.ChevronRight}
-      title={entry.day}
+      icon={Icon.Calendar}
+      title={entry.title}
       accessories={[
-        {
-          text: {
-            value: `Czas: ${entry.timeSummary.toString()}h`,
-            color: entry.timeSummary >= 8 ? Color.Green : Color.Red,
-          },
-        },
+        showAccessories
+          ? {
+              text: {
+                value: `Czas: ${entry.timeSummary.toString()}h`,
+                color: entry.timeSummary >= 8 ? Color.Green : Color.Red,
+              },
+            }
+          : {},
       ]}
-      actions={
-        <ActionPanel>
-          <Action.Push title="Przejdź do podsumowania dnia" target={<DayList day={entry.day} />} />
-        </ActionPanel>
+      detail={
+        <List.Item.Detail
+          metadata={
+            <List.Item.Detail.Metadata>
+              {dayTasks.map((task) => (
+                <>
+                  <List.Item.Detail.Metadata.Label
+                    title="Zadanie"
+                    icon={Icon.Hashtag}
+                    text={task.key ? `${task.key} - ${task.summary}` : task.summary}
+                  />
+                  <List.Item.Detail.Metadata.Label title="Ilość godzin" icon={Icon.Clock} text={`${task.timeEntry}h`} />
+                  {task.description ? <List.Item.Detail.Metadata.Label title="Opis" text={task.description} /> : null}
+                  <List.Item.Detail.Metadata.Separator />
+                </>
+              ))}
+            </List.Item.Detail.Metadata>
+          }
+        />
       }
     />
   )

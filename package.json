@@ -3,7 +3,7 @@
   "name": "godzinki",
   "title": "Godzinki",
   "description": "",
-  "icon": "command-icon.png",
+  "icon": "extension_icon@128px.png",
   "author": "hindo",
   "license": "MIT",
   "commands": [

@@ -1,4 +1,5 @@
 import { LocalStorage } from "@raycast/api"
+import { format, getDay, getTime } from "date-fns"
 import { nanoid } from "nanoid"
 import { create } from "zustand"
 import { createJSONStorage, persist, StateStorage } from "zustand/middleware"
@@ -15,7 +16,28 @@ const raycastStorage: StateStorage = {
   },
 }
 
-export const useStore = create(
+export type Task = {
+  id: string
+  key: string | null
+  summary: string
+  timeEntry: string
+  description: string | null
+  createdAt: string
+}
+
+export type DayEntry = {
+  id: string
+  title: string
+  day: string
+  timeSummary: number
+}
+
+type TaskStore = {
+  tasks: Task[]
+  addTask: (newTask: Omit<Task, "id">) => void
+}
+
+export const useStore = create<TaskStore>()(
   persist(
     (set) => ({
       tasks: [],
@@ -28,10 +50,10 @@ export const useStore = create(
   )
 )
 
-export const dayItemSelector = (state) => {
+export const dayItemSelector = (state: TaskStore) => {
   const dE = state.tasks
-    .sort((a, b) => b.createdAt - a.createdAt)
-    .reduce((acc, item) => {
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .reduce((acc: Record<string, number>, item) => {
       if (acc[item.createdAt]) {
         acc[item.createdAt] += parseInt(item.timeEntry)
       } else {
@@ -40,9 +62,12 @@ export const dayItemSelector = (state) => {
       return acc
     }, {})
 
-  return Object.entries(dE).map(([day, timeSummary]: [string, number]) => ({
-    id: nanoid(),
-    day,
-    timeSummary,
-  }))
+  return Object.entries(dE).map(([day, timeSummary]: [string, number]) => {
+    return {
+      id: nanoid(),
+      title: format(new Date(day), "PPPP"),
+      day,
+      timeSummary,
+    }
+  })
 }

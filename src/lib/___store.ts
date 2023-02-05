@@ -10,15 +10,6 @@ export type TaskEntry = {
   summary: string
 }
 
-export type Entry = {
-  id: string
-  key: string | null
-  summary: string
-  timeEntry: number
-  description: string | null
-  createdAt: Date
-}
-
 export type NewEntry = Omit<Entry, "id">
 
 let store: Entry[] = []

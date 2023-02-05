@@ -44,8 +44,6 @@ export const AddEntryForm = () => {
   }
 
   const handleFormSubmission = (values: Record<string, string>) => {
-    console.log("values", values)
-
     const { key, summary, timeEntry, description, createdAt } = values
 
     if (!summary || !summary.length) {
