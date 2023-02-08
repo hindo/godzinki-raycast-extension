@@ -55,9 +55,9 @@ export const dayItemSelector = (state: TaskStore) => {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .reduce((acc: Record<string, number>, item) => {
       if (acc[item.createdAt]) {
-        acc[item.createdAt] += parseInt(item.timeEntry)
+        acc[item.createdAt] += parseFloat(item.timeEntry)
       } else {
-        acc[item.createdAt] = parseInt(item.timeEntry)
+        acc[item.createdAt] = parseFloat(item.timeEntry)
       }
       return acc
     }, {})
