@@ -1,6 +1,7 @@
-import { Color, Icon, List } from "@raycast/api"
+import { Action, ActionPanel, Color, Icon, List } from "@raycast/api"
 import { Fragment } from "react"
-import { DayEntry, Task, useStore } from "../lib/store"
+import { DayEntry, useStore } from "../lib/store"
+import { DayList } from "./DayList";
 
 export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry; showAccessories: boolean }) => {
   const tasks = useStore((state) => state.tasks)
@@ -16,13 +17,18 @@ export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry
       accessories={[
         showAccessories
           ? {
-              text: {
-                value: `Czas: ${entry.timeSummary.toString()}h`,
-                color: entry.timeSummary >= 8 ? Color.Green : Color.Red,
-              },
-            }
+            text: {
+              value: `Czas: ${entry.timeSummary.toString()}h`,
+              color: entry.timeSummary >= 8 ? Color.Green : Color.Red,
+            },
+          }
           : {},
       ]}
+      actions={
+        <ActionPanel>
+          <Action.Push title="Zobacz listę" target={<DayList day={entry.day} />} />
+        </ActionPanel>
+      }
       detail={
         <List.Item.Detail
           metadata={

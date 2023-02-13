@@ -1,4 +1,4 @@
-import { ActionPanel, List, Action, Icon, LocalStorage, confirmAlert, Alert } from "@raycast/api"
+import { ActionPanel, List, Action, Icon, LocalStorage, confirmAlert, Alert, showToast } from "@raycast/api"
 import { useState } from "react"
 import { AddEntryForm } from "./components/AddEntryForm"
 import { DayListItem } from "./components/DayListItem"
@@ -8,6 +8,7 @@ import { dayItemSelector, useStore } from "./lib/store"
 export default function Command() {
   const [showDetails, setShowDetails] = useState<boolean>(false)
   const days = useStore(dayItemSelector)
+  const { fixTasks } = useStore()
 
   const handleDataBackup = async () => {
     const data = await LocalStorage.getItem("godziny")
@@ -40,6 +41,27 @@ export default function Command() {
     }
   }
 
+  const handleFixTimeEntries = async () => {
+    if (
+      await confirmAlert({
+        title: "Czy chciałbyś zapisać kopię danych?",
+        message: "Naprawa powinna działać bez problemów, ale nie daje grarancji.",
+        icon: Icon.Info,
+        primaryAction: {
+          title: "Wykonaj zapis kopii",
+          style: Alert.ActionStyle.Default,
+        },
+        dismissAction: {
+          title: "Anuluj",
+        },
+      })
+    ) {
+      await handleDataBackup()
+    }
+    fixTasks()
+    await showToast({ title: "Naprawa danych", message: `` })
+  }
+
   return (
     <List isShowingDetail={showDetails} onSelectionChange={handleOnSelectionChange}>
       <List.Item
@@ -50,6 +72,7 @@ export default function Command() {
           <ActionPanel>
             <Action.Push title="Przejdź dodowania nowego wpisu" target={<AddEntryForm />} />
             <Action title="Zrób backup" onAction={handleDataBackup} />
+            <Action title="Napraw błędne wpisy" onAction={handleFixTimeEntries} />
             <Action title="Wyczyść magazyn" onAction={handleStoreClear} />
           </ActionPanel>
         }

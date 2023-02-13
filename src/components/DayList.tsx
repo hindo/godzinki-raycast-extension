@@ -1,22 +1,25 @@
-import { List } from "@raycast/api"
-import { useSQL } from "@raycast/utils"
-import { useState } from "react"
-import { DAY_SUMMARY_LIST_QUERY } from "../lib/queries"
-import { Entry } from "../types"
+import { Action, ActionPanel, List } from "@raycast/api"
+import { useStore } from "../lib/store"
+import { AddEntryForm } from "./AddEntryForm"
 
 export const DayList = ({ day }: { day: string }) => {
-  const [data, setData] = useState([])
+  const dayTasks = useStore(store => store.tasks.filter(task => task.createdAt === day))
   return (
     <List>
-      {(data || []).map((entry) => (
+      {dayTasks.map((entry) => (
         <List.Item
           key={entry.id}
           title={entry.summary}
           accessories={[
             {
-              text: `${entry.czas}h`,
+              text: `${entry.timeEntry}h`,
             },
           ]}
+          actions={
+            <ActionPanel>
+              <Action.Push title="Edytuj wpis" target={<AddEntryForm entry={entry} />} />
+            </ActionPanel>
+          }
         />
       ))}
     </List>

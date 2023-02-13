@@ -1,5 +1,5 @@
 import { LocalStorage } from "@raycast/api"
-import { format, getDay, getTime } from "date-fns"
+import { format } from "date-fns"
 import { nanoid } from "nanoid"
 import { create } from "zustand"
 import { createJSONStorage, persist, StateStorage } from "zustand/middleware"
@@ -35,6 +35,8 @@ export type DayEntry = {
 type TaskStore = {
   tasks: Task[]
   addTask: (newTask: Omit<Task, "id">) => void
+  updateTask: (updatedTask: Task) => void
+  fixTasks: () => void
 }
 
 export const useStore = create<TaskStore>()(
@@ -42,6 +44,8 @@ export const useStore = create<TaskStore>()(
     (set) => ({
       tasks: [],
       addTask: (newTask) => set((state) => ({ tasks: [...state.tasks, { ...newTask, id: nanoid() }] })),
+      updateTask: (updatedTask) => set((state) => ({ tasks: [...state.tasks.filter(task => task.id !== updatedTask.id), updatedTask] })),
+      fixTasks: () => set((state) => ({ tasks: fixFloatingPointsInStore(state.tasks) })),
     }),
     {
       name: "godziny",
@@ -70,4 +74,13 @@ export const dayItemSelector = (state: TaskStore) => {
       timeSummary,
     }
   })
+}
+
+// local
+
+const fixFloatingPointsInStore = (tasks: Task[]) => {
+  return tasks.map((task) => ({
+    ...task,
+    timeEntry: task.timeEntry.replace(",", "."),
+  }))
 }

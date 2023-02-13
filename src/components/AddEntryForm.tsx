@@ -3,24 +3,31 @@ import { AxiosError } from "axios"
 import { format } from "date-fns"
 import { useEffect, useState } from "react"
 import { fetchJiraSummary } from "../lib/jira"
-import { useStore } from "../lib/store"
+import { Task, useStore } from "../lib/store"
 import { TaskEntry } from "../types"
 
-export const AddEntryForm = () => {
-  const { pop } = useNavigation()
-  const tasks = useStore((state) => state.tasks)
-  const addTask = useStore((state) => state.addTask)
+type FormValues = {
+  key: string,
+  summary: string,
+  timeEntry: string,
+  description: string,
+  createdAt: Date
+}
 
-  const [jiraTicketId, setJiraTicketId] = useState<string>("")
+export const AddEntryForm = ({ entry }: { entry?: Task }) => {
+  const { pop } = useNavigation()
+  const { tasks, addTask, updateTask } = useStore()
+
+  const [jiraTicketId, setJiraTicketId] = useState<string>(entry?.key || "")
   const [jiraTicketIdError, setJiraTicketIdError] = useState<string | undefined>()
 
-  const [summary, setSummary] = useState<string>("")
+  const [summary, setSummary] = useState<string>(entry?.summary || "")
   const [summaryError, setSummaryError] = useState<string | undefined>()
 
-  const [timeEntry, setTimeEntry] = useState<string>("")
+  const [timeEntry, setTimeEntry] = useState<string>(entry?.timeEntry || "")
   const [timeEntryError, setTimeEntryError] = useState<string | undefined>()
 
-  const [createdAt, setCreatedAt] = useState<Date | null>(new Date())
+  const [createdAt, setCreatedAt] = useState<Date | null>(entry?.createdAt ? new Date(entry.createdAt) : new Date())
   const [createdAtError, setCreatedAtError] = useState<string | undefined>()
 
   const handleDropdownChange = (value: string) => {
@@ -43,7 +50,7 @@ export const AddEntryForm = () => {
     }
   }
 
-  const handleFormSubmission = (values: Record<string, string>) => {
+  const handleFormSubmission = (values: FormValues) => {
     const { key, summary, timeEntry, description, createdAt } = values
 
     if (!summary || !summary.length) {
@@ -56,17 +63,24 @@ export const AddEntryForm = () => {
       return
     }
 
-    if (!createdAt) {
+    if (!createdAt && !entry) {
       setCreatedAtError("Error")
       return
     }
 
-    addTask({
+    !entry ? addTask({
       key,
       summary,
       timeEntry,
       description,
       createdAt: format(createdAt, "yyyy-MM-dd"),
+    }) : updateTask({
+      id: entry.id,
+      key,
+      summary,
+      timeEntry,
+      description,
+      createdAt: entry.createdAt
     })
 
     pop()
@@ -86,29 +100,34 @@ export const AddEntryForm = () => {
         </ActionPanel>
       }
     >
-      <Form.DatePicker
-        id="createdAt"
-        type={Form.DatePicker.Type.Date}
-        value={createdAt}
-        onChange={(v) => {
-          setCreatedAtError(undefined)
-          setCreatedAt(v)
-        }}
-        error={createdAtError}
-      />
-      <Form.Dropdown id="task" title="Zadanie" onChange={handleDropdownChange}>
-        <Form.Dropdown.Item value="newTask" title="Dodaj nowe zadanie" icon={Icon.PlusCircle} />
-        <Form.Dropdown.Section title="Istniejące zadania">
-          {tasks.map((taskEntry) => (
-            <Form.Dropdown.Item
-              key={taskEntry.id}
-              value={JSON.stringify(taskEntry)}
-              title={taskEntry.key ? `${taskEntry.key} - ${taskEntry.summary}` : taskEntry.summary}
-              icon={Icon.Cd}
-            />
-          ))}
-        </Form.Dropdown.Section>
-      </Form.Dropdown>
+      {!entry ? (
+        <>
+          <Form.DatePicker
+            id="createdAt"
+            type={Form.DatePicker.Type.Date}
+            value={createdAt}
+            onChange={(v) => {
+              setCreatedAtError(undefined)
+              setCreatedAt(v)
+            }}
+            error={createdAtError}
+          />
+
+          <Form.Dropdown id="task" title="Zadanie" onChange={handleDropdownChange}>
+            <Form.Dropdown.Item value="newTask" title="Dodaj nowe zadanie" icon={Icon.PlusCircle} />
+            <Form.Dropdown.Section title="Istniejące zadania">
+              {tasks.map((taskEntry) => (
+                <Form.Dropdown.Item
+                  key={taskEntry.id}
+                  value={JSON.stringify(taskEntry)}
+                  title={taskEntry.key ? `${taskEntry.key} - ${taskEntry.summary}` : taskEntry.summary}
+                  icon={Icon.Cd}
+                />
+              ))}
+            </Form.Dropdown.Section>
+          </Form.Dropdown>
+        </>
+      ) : null}
       <Form.TextField
         id="key"
         title="Jira ID"
@@ -139,7 +158,7 @@ export const AddEntryForm = () => {
         }}
         error={timeEntryError}
       />
-      <Form.TextArea id="description" title="Opis" />
+      <Form.TextArea id="description" title="Opis" defaultValue={entry?.description || ''} />
     </Form>
   )
 }
