@@ -36,6 +36,7 @@ type TaskStore = {
   tasks: Task[]
   addTask: (newTask: Omit<Task, "id">) => void
   updateTask: (updatedTask: Task) => void
+  removeTask: (id: string) => void
   fixTasks: () => void
 }
 
@@ -44,7 +45,9 @@ export const useStore = create<TaskStore>()(
     (set) => ({
       tasks: [],
       addTask: (newTask) => set((state) => ({ tasks: [...state.tasks, { ...newTask, id: nanoid() }] })),
-      updateTask: (updatedTask) => set((state) => ({ tasks: [...state.tasks.filter(task => task.id !== updatedTask.id), updatedTask] })),
+      updateTask: (updatedTask) =>
+        set((state) => ({ tasks: [...state.tasks.filter((task) => task.id !== updatedTask.id), updatedTask] })),
+      removeTask: (id) => set((state) => ({ tasks: state.tasks.filter((task) => task.id !== id) })),
       fixTasks: () => set((state) => ({ tasks: fixFloatingPointsInStore(state.tasks) })),
     }),
     {
