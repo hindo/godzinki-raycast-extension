@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Color, Icon, List } from "@raycast/api"
+import { Action, ActionPanel, Clipboard, Color, Icon, List } from "@raycast/api"
 import { Fragment } from "react"
 import { DayEntry, useStore } from "../lib/store"
 import { DayList } from "./DayList";
@@ -7,6 +7,18 @@ export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry
   const tasks = useStore((state) => state.tasks)
 
   const dayTasks = tasks.filter((task) => task.createdAt === entry.day)
+
+  const handleCopyDaySummaryToClipboard = async () => {
+    const summary = dayTasks.map(task => {
+      return task.key ? task.key : task.summary
+    }).reduce((acc: string[], task: string) => {
+      if (acc.includes(task)) {
+        return acc
+      }
+      return [...acc, task]
+    }, []).sort().join('; ')
+    await Clipboard.copy(summary)
+  }
 
   return (
     <List.Item
@@ -27,6 +39,7 @@ export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry
       actions={
         <ActionPanel>
           <Action.Push title="Zobacz listę" target={<DayList day={entry.day} />} />
+          <Action title="Copy day summary to clipboard" onAction={() => handleCopyDaySummaryToClipboard()} />
         </ActionPanel>
       }
       detail={

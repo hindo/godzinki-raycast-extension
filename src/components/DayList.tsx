@@ -23,6 +23,7 @@ export const DayList = ({ day }: { day: string }) => {
       removeTask(id)
     }
   }
+
   return (
     <List>
       {dayTasks.map((entry) => (
