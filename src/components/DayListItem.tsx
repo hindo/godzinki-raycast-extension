@@ -1,7 +1,7 @@
 import { Action, ActionPanel, Clipboard, Color, Icon, List } from "@raycast/api"
 import { Fragment } from "react"
-import { DayEntry, useStore } from "../lib/store"
-import { DayList } from "./DayList";
+import { DayEntry, Task, useStore } from "../lib/store"
+import { DayList } from "./DayList"
 
 export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry; showAccessories: boolean }) => {
   const tasks = useStore((state) => state.tasks)
@@ -9,15 +9,45 @@ export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry
   const dayTasks = tasks.filter((task) => task.createdAt === entry.day)
 
   const handleCopyDaySummaryToClipboard = async () => {
-    const summary = dayTasks.map(task => {
-      return task.key ? task.key : task.summary
-    }).reduce((acc: string[], task: string) => {
-      if (acc.includes(task)) {
-        return acc
-      }
-      return [...acc, task]
-    }, []).sort().join('; ')
+    const summary = dayTasks
+      .map((task) => {
+        return task.key ? task.key : task.summary
+      })
+      .reduce((acc: string[], task: string) => {
+        if (acc.includes(task)) {
+          return acc
+        }
+        return [...acc, task]
+      }, [])
+      .sort()
+      .join("; ")
     await Clipboard.copy(summary)
+  }
+
+  const handleCopyMonthSummaryToClipboard = async () => {
+    const summary = tasks
+      .reduce((acc: Task[], task: Task) => {
+        const entry = acc.find((entry: Task) => entry.key === task.key && entry.summary === task.summary)
+        if (entry) {
+          const updatedEntry = {
+            ...entry,
+            timeEntry: (parseFloat(entry.timeEntry) + parseFloat(task.timeEntry)).toString(),
+          } as Task
+          console.log(updatedEntry)
+          return [...acc.filter((task) => task.id !== entry.id), updatedEntry]
+        }
+
+        return [...acc, task]
+      }, [])
+      .map((task) => {
+        return `${task.key};${task.summary};?;${task.timeEntry}`
+      })
+      .join("\n")
+
+    await Clipboard.copy(
+      `Jira;Opis zadania;Status;Czas
+      ${summary}`
+    )
   }
 
   return (
@@ -40,6 +70,7 @@ export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry
         <ActionPanel>
           <Action.Push title="Zobacz listę" target={<DayList day={entry.day} />} />
           <Action title="Copy day summary to clipboard" onAction={() => handleCopyDaySummaryToClipboard()} />
+          <Action title="Copy month summary to clipboard" onAction={() => handleCopyMonthSummaryToClipboard()} />
         </ActionPanel>
       }
       detail={
