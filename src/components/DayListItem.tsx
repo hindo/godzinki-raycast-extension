@@ -1,4 +1,6 @@
 import { Action, ActionPanel, Clipboard, Color, Icon, List } from "@raycast/api"
+import endOfMonth from "date-fns/endOfMonth"
+import startOfMonth from "date-fns/startOfMonth"
 import { Fragment } from "react"
 import { DayEntry, Task, useStore } from "../lib/store"
 import { DayList } from "./DayList"
@@ -25,7 +27,14 @@ export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry
   }
 
   const handleCopyMonthSummaryToClipboard = async () => {
+    const monthStart = startOfMonth(new Date(entry.day))
+    const monthEnd = endOfMonth(new Date(entry.day))
+
     const summary = tasks
+      .filter((task) => {
+        const createdAtDate = new Date(task.createdAt)
+        return createdAtDate >= monthStart && createdAtDate <= monthEnd
+      })
       .reduce((acc: Task[], task: Task) => {
         const entry = acc.find((entry: Task) => entry.key === task.key && entry.summary === task.summary)
         if (entry) {
@@ -59,11 +68,11 @@ export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry
       accessories={[
         showAccessories
           ? {
-            text: {
-              value: `Czas: ${entry.timeSummary.toString()}h`,
-              color: entry.timeSummary >= 8 ? Color.Green : Color.Red,
-            },
-          }
+              text: {
+                value: `Czas: ${entry.timeSummary.toString()}h`,
+                color: entry.timeSummary >= 8 ? Color.Green : Color.Red,
+              },
+            }
           : {},
       ]}
       actions={
