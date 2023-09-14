@@ -26,6 +26,20 @@ export const DayList = ({ day }: { day: string }) => {
 
   return (
     <List>
+      <List.Item
+        key="new"
+        title="Dodaj kolejne zadanie"
+        accessories={[
+          {
+            text: `${day}`,
+          },
+        ]}
+        actions={
+          <ActionPanel>
+            <Action.Push title="Dodaj wpis" target={<AddEntryForm forceDate={day} />} />
+          </ActionPanel>
+        }
+      ></List.Item>
       {dayTasks.map((entry) => (
         <List.Item
           key={entry.id}

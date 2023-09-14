@@ -1,6 +1,7 @@
 import { Action, ActionPanel, Detail, Icon, List } from "@raycast/api"
+import { TaskEntry } from "../types"
 
-export const TaskListItem = ({ entry }) => {
+export const TaskListItem = ({ entry }: { entry: TaskEntry }) => {
   return (
     <List.Item
       key={entry.id}

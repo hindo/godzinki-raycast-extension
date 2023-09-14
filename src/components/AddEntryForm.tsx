@@ -7,14 +7,14 @@ import { Task, useStore } from "../lib/store"
 import { TaskEntry } from "../types"
 
 type FormValues = {
-  key: string,
-  summary: string,
-  timeEntry: string,
-  description: string,
+  key: string
+  summary: string
+  timeEntry: string
+  description: string
   createdAt: Date
 }
 
-export const AddEntryForm = ({ entry }: { entry?: Task }) => {
+export const AddEntryForm = ({ entry, forceDate }: { entry?: Task; forceDate?: string }) => {
   const { pop } = useNavigation()
   const { tasks, addTask, updateTask } = useStore()
 
@@ -27,7 +27,15 @@ export const AddEntryForm = ({ entry }: { entry?: Task }) => {
   const [timeEntry, setTimeEntry] = useState<string>(entry?.timeEntry || "")
   const [timeEntryError, setTimeEntryError] = useState<string | undefined>()
 
-  const [createdAt, setCreatedAt] = useState<Date | null>(entry?.createdAt ? new Date(entry.createdAt) : new Date())
+  const [createdAt, setCreatedAt] = useState<Date | null>(() => {
+    if (entry?.createdAt) {
+      return new Date(entry.createdAt)
+    }
+    if (forceDate) {
+      return new Date(forceDate)
+    }
+    return new Date()
+  })
   const [createdAtError, setCreatedAtError] = useState<string | undefined>()
 
   const handleDropdownChange = (value: string) => {
@@ -68,20 +76,22 @@ export const AddEntryForm = ({ entry }: { entry?: Task }) => {
       return
     }
 
-    !entry ? addTask({
-      key,
-      summary,
-      timeEntry,
-      description,
-      createdAt: format(createdAt, "yyyy-MM-dd"),
-    }) : updateTask({
-      id: entry.id,
-      key,
-      summary,
-      timeEntry,
-      description,
-      createdAt: entry.createdAt
-    })
+    !entry
+      ? addTask({
+          key,
+          summary,
+          timeEntry,
+          description,
+          createdAt: format(createdAt, "yyyy-MM-dd"),
+        })
+      : updateTask({
+          id: entry.id,
+          key,
+          summary,
+          timeEntry,
+          description,
+          createdAt: entry.createdAt,
+        })
 
     pop()
   }
@@ -158,7 +168,7 @@ export const AddEntryForm = ({ entry }: { entry?: Task }) => {
         }}
         error={timeEntryError}
       />
-      <Form.TextArea id="description" title="Opis" defaultValue={entry?.description || ''} />
+      <Form.TextArea id="description" title="Opis" defaultValue={entry?.description || ""} />
     </Form>
   )
 }
