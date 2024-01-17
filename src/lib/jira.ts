@@ -1,20 +1,25 @@
-import axios from "axios";
+import axios from "axios"
+import { getPreferenceValues } from "@raycast/api"
 
-const JIRA_URL = "https://pcol.atlassian.net/rest/api/2/issue/{tickedId}?fields=summary,status";
-const JIRA_USER = "ppabich@valuelogic.one";
-const JIRA_TOKEN =
-  "ATATT3xFfGF02cHsgJG1cEdSuYEXMB0D20Eso-WoeiSgybSbgX99c5jlw9VJzlbmAkXZ_2sUNg1-idlrKKTzdHztym04zTLgUUCn0QqU7akZWwhSZsYIISE2Yw8-1I10WMgN1xARnISYXmE6ufB51fbxxJ3QgmHpi-pEQLyzXeAS20kO8eTbINo=1547957F";
+type Preferences = {
+  jiraUrl: string
+  jiraUser: string
+  jiraToken: string
+}
 
 export const fetchJiraSummary = async (tickedId: string) => {
-
-  const url = JIRA_URL.replaceAll('{tickedId}', tickedId)
+  const preferences = getPreferenceValues<Preferences>()
+  const url = `${preferences.jiraUrl}/rest/api/2/issue/{tickedId}?fields=summary,status`.replaceAll(
+    "{tickedId}",
+    tickedId
+  )
 
   const headers = {
-    'Authorization': `Basic ${Buffer.from(JIRA_USER+':'+JIRA_TOKEN).toString('base64')}`
+    Authorization: `Basic ${Buffer.from(preferences.jiraUser + ":" + preferences.jiraToken).toString("base64")}`,
   }
 
   const response = await axios({
-    method: 'GET',
+    method: "GET",
     url: url,
     headers: headers,
   })

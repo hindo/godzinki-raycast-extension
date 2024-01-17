@@ -1,4 +1,14 @@
-import { ActionPanel, List, Action, Icon, LocalStorage, confirmAlert, Alert, showToast } from "@raycast/api"
+import {
+  ActionPanel,
+  List,
+  Action,
+  Icon,
+  LocalStorage,
+  confirmAlert,
+  Alert,
+  showToast,
+  openExtensionPreferences,
+} from "@raycast/api"
 import { useState } from "react"
 import { AddEntryForm } from "./components/AddEntryForm"
 import { DayListItem } from "./components/DayListItem"
@@ -74,6 +84,7 @@ export default function Command() {
             <Action title="Zrób backup" onAction={handleDataBackup} />
             <Action title="Napraw błędne wpisy" onAction={handleFixTimeEntries} />
             <Action title="Wyczyść magazyn" onAction={handleStoreClear} />
+            <Action title="Otwórz ustawienia" onAction={openExtensionPreferences} />
           </ActionPanel>
         }
       />

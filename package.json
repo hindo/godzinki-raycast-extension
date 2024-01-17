@@ -10,14 +10,37 @@
     {
       "name": "index",
       "title": "Godzinki",
-      "description": "",
-      "mode": "view"
+      "description": "Rozszerzenie do zapisywania godzinek pracy.",
+      "mode": "view",
+      "preferences": [
+        {
+          "name": "jiraUrl",
+          "title": "JIRA location",
+          "description": "Adres url do JIRA-y",
+          "required": true,
+          "type": "textfield"
+        },
+        {
+          "name": "jiraUser",
+          "title": "JIRA user",
+          "description": "Podaj email użytkownika JIRA-y",
+          "required": true,
+          "type": "textfield"
+        },
+        {
+          "name": "jiraToken",
+          "title": "JIRA Token",
+          "description": "Podaj token wygenerowany  w JIRA-rze",
+          "required": true,
+          "type": "textfield"
+        }
+      ]
     }
   ],
   "dependencies": {
     "@raycast/api": "^1.47.1",
     "@raycast/utils": "^1.4.16",
-    "axios": "^1.3.2",
+    "axios": "^1.6.5",
     "date-fns": "^2.29.3",
     "nanoid": "^4.0.0",
     "zustand": "^4.3.2"
