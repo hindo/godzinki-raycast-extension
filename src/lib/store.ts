@@ -3,6 +3,7 @@ import { format } from "date-fns"
 import { nanoid } from "nanoid"
 import { create } from "zustand"
 import { createJSONStorage, persist, StateStorage } from "zustand/middleware"
+import { Task, TaskStore } from "../types"
 
 const raycastStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -14,30 +15,6 @@ const raycastStorage: StateStorage = {
   removeItem: async (name: string): Promise<void> => {
     await LocalStorage.removeItem(name)
   },
-}
-
-export type Task = {
-  id: string
-  key: string | null
-  summary: string
-  timeEntry: string
-  description: string | null
-  createdAt: string
-}
-
-export type DayEntry = {
-  id: string
-  title: string
-  day: string
-  timeSummary: number
-}
-
-type TaskStore = {
-  tasks: Task[]
-  addTask: (newTask: Omit<Task, "id">) => void
-  updateTask: (updatedTask: Task) => void
-  removeTask: (id: string) => void
-  fixTasks: () => void
 }
 
 export const useStore = create<TaskStore>()(

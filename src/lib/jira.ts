@@ -1,11 +1,6 @@
 import axios from "axios"
 import { getPreferenceValues } from "@raycast/api"
-
-type Preferences = {
-  jiraUrl: string
-  jiraUser: string
-  jiraToken: string
-}
+import { Preferences } from "../types"
 
 export const fetchJiraSummary = async (tickedId: string) => {
   const preferences = getPreferenceValues<Preferences>()

@@ -2,7 +2,8 @@ import { Action, ActionPanel, Clipboard, Color, Icon, List } from "@raycast/api"
 import endOfMonth from "date-fns/endOfMonth"
 import startOfMonth from "date-fns/startOfMonth"
 import { Fragment } from "react"
-import { DayEntry, Task, useStore } from "../lib/store"
+import { useStore } from "../lib/store"
+import { DayEntry, Task } from "../types"
 import { DayList } from "./DayList"
 
 export const DayListItem = ({ entry, showAccessories = true }: { entry: DayEntry; showAccessories: boolean }) => {

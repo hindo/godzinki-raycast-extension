@@ -55,10 +55,10 @@ export default function Command() {
     if (
       await confirmAlert({
         title: "Czy chciałbyś zapisać kopię danych?",
-        message: "Naprawa powinna działać bez problemów, ale nie daje grarancji.",
+        message: "Naprawa powinna działać bez problemów, ale nie daję grarancji.",
         icon: Icon.Info,
         primaryAction: {
-          title: "Wykonaj zapis kopii",
+          title: "Wykonaj utworzenie kopii",
           style: Alert.ActionStyle.Default,
         },
         dismissAction: {
@@ -80,7 +80,7 @@ export default function Command() {
         title="Dodaj nowy wpis"
         actions={
           <ActionPanel>
-            <Action.Push title="Przejdź dodowania nowego wpisu" target={<AddEntryForm />} />
+            <Action.Push title="Przejdź do dowania nowego wpisu" target={<AddEntryForm />} />
             <Action title="Zrób backup" onAction={handleDataBackup} />
             <Action title="Napraw błędne wpisy" onAction={handleFixTimeEntries} />
             <Action title="Wyczyść magazyn" onAction={handleStoreClear} />

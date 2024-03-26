@@ -3,8 +3,8 @@ import { AxiosError } from "axios"
 import { format } from "date-fns"
 import { useEffect, useState } from "react"
 import { fetchJiraSummary } from "../lib/jira"
-import { Task, useStore } from "../lib/store"
-import { TaskEntry } from "../types"
+import { useStore } from "../lib/store"
+import { Task, TaskEntry } from "../types"
 
 type FormValues = {
   key: string
